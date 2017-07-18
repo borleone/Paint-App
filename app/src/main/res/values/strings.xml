@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Paint</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_color">Pick Color</string>
+    <string name="action_size">Brush size</string>
+</resources>

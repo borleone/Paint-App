@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/brush_size"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp"
+        android:textSize="@dimen/default_preview_height"
+        android:gravity="center"
+        android:textStyle="bold" />
+
+    <SeekBar
+        android:id="@+id/brush_seek"
+        android:layout_width="220dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp" />
+
+    <Button
+        android:id="@+id/btn_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OK" />
+</LinearLayout>

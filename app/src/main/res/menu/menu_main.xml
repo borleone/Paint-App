@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.borleone.paint.MainActivity">
+    <item
+        android:id="@+id/action_clear"
+        android:orderInCategory="100"
+        android:title="@string/action_clear"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_color"
+        android:orderInCategory="100"
+        android:title="@string/action_color"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_size"
+        android:orderInCategory="100"
+        android:title="@string/action_size"
+        app:showAsAction="never" />
+</menu>
