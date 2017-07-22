@@ -4,4 +4,5 @@
     <string name="action_clear">Clear</string>
     <string name="action_color">Pick Color</string>
     <string name="action_size">Brush size</string>
+    <string name="action_save">Save Drawing</string>
 </resources>

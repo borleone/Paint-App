@@ -6,15 +6,27 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.Environment;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by Borle on 6/3/2017.
  */
 public class PaintActivity extends View {
 
+    String TAG = "PAINT";
+    String packageName;
     public int width;
     public int height;
     private Bitmap mBitmap;
@@ -24,6 +36,8 @@ public class PaintActivity extends View {
 
     public PaintActivity(Context context, AttributeSet attrs) {
         super(context, attrs);
+        packageName = context.getPackageName();
+
         mPath = new Path();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         mPaint = new Paint();
@@ -34,6 +48,7 @@ public class PaintActivity extends View {
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(20);
+        setDrawingCacheEnabled(true);
     }
 
     @Override
@@ -45,6 +60,7 @@ public class PaintActivity extends View {
 
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
+        mCanvas.drawColor(Color.WHITE);
     }
 
     @Override
@@ -112,21 +128,65 @@ public class PaintActivity extends View {
         setDrawingCacheEnabled(true);
     }
 
-    public void changeColor(int color){
+    public void changeColor(int color) {
         mPaint.setColor(color);
     }
 
-    public int getColor(){
+    public int getColor() {
         return mPaint.getColor();
     }
 
-    public void changeStrokeWidth(float size){
+    public void changeStrokeWidth(float size) {
         mPaint.setStrokeWidth(size);
     }
 
-    public float getStrokeWidth(){
+    public float getStrokeWidth() {
         return mPaint.getStrokeWidth();
     }
+
+    public void saveDrawing() {
+        Bitmap image = getDrawingCache();
+
+        File pictureFile = getOutputMediaFile();
+        Log.d(TAG, pictureFile.toString());
+
+        if (pictureFile == null) {
+            Log.d(TAG, "Error creating media file, check storage permissions: ");
+            return;
+        }
+        try {
+            FileOutputStream fos = new FileOutputStream(pictureFile);
+            image.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.close();
+        } catch (FileNotFoundException e) {
+            Log.d(TAG, "File not found: " + e.getMessage());
+        } catch (IOException e) {
+            Log.d(TAG, "Error accessing file: " + e.getMessage());
+        } catch (Exception e) {
+            Log.d(TAG, "Exception: " + e.getMessage());
+        }
+
+        Toast.makeText(getContext(), "Image saved successfully", Toast.LENGTH_LONG).show();
+    }
+
+    private File getOutputMediaFile() {
+
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "Paint");
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            //mediaStorageDir.mkdirs();
+            Log.d(TAG, mediaStorageDir.mkdirs() + " " + mediaStorageDir.toString());
+        }
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
+        File mediaFile;
+        String mImageName = "MI_" + timeStamp + ".png";
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
+        Log.d(TAG, mImageName);
+        return mediaFile;
+    }
+
 
 }
 

@@ -1,9 +1,12 @@
 package com.borleone.paint;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,6 +60,12 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_size) {
             // Display dialog to select width of strokes
             changeBrushWidth();
+            return true;
+        }
+        if (id == R.id.action_save) {
+            // Save the paint view as bmp
+            checkPermissionToWrite();
+            paintActivity.saveDrawing();
             return true;
         }
 
@@ -133,6 +142,13 @@ public class MainActivity extends AppCompatActivity {
 
         brushSizeDialog.show();
 
+    }
+
+    public void checkPermissionToWrite() {
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permissionCheck == -1) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 225);
+        }
     }
 
 }
