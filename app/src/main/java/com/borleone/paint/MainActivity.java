@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,12 +25,45 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 public class MainActivity extends AppCompatActivity {
 
     private PaintActivity paintActivity;
+    private ImageButton clearBtn, colorBtn, brushBtn, saveBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_main);
         paintActivity = (PaintActivity) findViewById(R.id.paint);
+
+        clearBtn = (ImageButton) findViewById(R.id.clear_btn);
+        clearBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                paintActivity.clear();
+            }
+        });
+        colorBtn = (ImageButton) findViewById(R.id.color_btn);
+        colorBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickColor();
+            }
+        });
+        brushBtn = (ImageButton) findViewById(R.id.brush_btn);
+        brushBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeBrushSize();
+            }
+        });
+        saveBtn = (ImageButton) findViewById(R.id.save_btn);
+        saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkPermissionToWrite();
+                paintActivity.saveDrawing();
+            }
+        });
+
+
     }
 
     @Override
@@ -59,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if (id == R.id.action_size) {
             // Display dialog to select width of strokes
-            changeBrushWidth();
+            changeBrushSize();
             return true;
         }
         if (id == R.id.action_save) {
@@ -102,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void changeBrushWidth() {
+    public void changeBrushSize() {
         final Dialog brushSizeDialog = new Dialog(this);
         brushSizeDialog.setTitle("Select Brush Size:");
         brushSizeDialog.setContentView(R.layout.brush_size);

@@ -1,6 +1,8 @@
 package com.borleone.paint;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,8 +11,11 @@ import android.graphics.Path;
 import android.os.Environment;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.File;
@@ -33,6 +38,8 @@ public class PaintActivity extends View {
     private Canvas mCanvas;
     private Path mPath;
     private Paint mBitmapPaint, mPaint;
+    String mImageName;
+    File mediaFile, mediaStorageDir;
 
     public PaintActivity(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -145,45 +152,77 @@ public class PaintActivity extends View {
     }
 
     public void saveDrawing() {
-        Bitmap image = getDrawingCache();
 
         File pictureFile = getOutputMediaFile();
-        Log.d(TAG, pictureFile.toString());
+        //Log.d(TAG, pictureFile.toString());
 
-        if (pictureFile == null) {
-            Log.d(TAG, "Error creating media file, check storage permissions: ");
-            return;
-        }
-        try {
-            FileOutputStream fos = new FileOutputStream(pictureFile);
-            image.compress(Bitmap.CompressFormat.PNG, 100, fos);
-            fos.close();
-        } catch (FileNotFoundException e) {
-            Log.d(TAG, "File not found: " + e.getMessage());
-        } catch (IOException e) {
-            Log.d(TAG, "Error accessing file: " + e.getMessage());
-        } catch (Exception e) {
-            Log.d(TAG, "Exception: " + e.getMessage());
-        }
-
-        Toast.makeText(getContext(), "Image saved successfully", Toast.LENGTH_LONG).show();
     }
 
     private File getOutputMediaFile() {
 
-        File mediaStorageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "Paint");
+        mediaStorageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "Paint");
 
         // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists()) {
             //mediaStorageDir.mkdirs();
-            Log.d(TAG, mediaStorageDir.mkdirs() + " " + mediaStorageDir.toString());
+            Log.e(TAG, mediaStorageDir.mkdirs() + " " + mediaStorageDir.toString());
         }
         // Create a media file name
         String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
-        File mediaFile;
-        String mImageName = "MI_" + timeStamp + ".png";
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
-        Log.d(TAG, mImageName);
+        mImageName = "MI_" + timeStamp;
+
+        //Save dialog box
+        LayoutInflater li = LayoutInflater.from(getContext());
+        View dialogView = li.inflate(R.layout.save_dialog, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+        alertDialogBuilder.setTitle("Save image with title");
+        // set save_dialog.xml to alertdialog builder
+        alertDialogBuilder.setView(dialogView);
+        final EditText userInput = (EditText) dialogView.findViewById(R.id.et_input);
+        userInput.setText(mImageName);
+        userInput.setSelectAllOnFocus(true);
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        mImageName = userInput.getText().toString();
+                        mImageName += ".png";
+                        mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
+                        Toast.makeText(getContext(), mImageName + " saved successfully", Toast.LENGTH_LONG).show();
+                        Log.e(TAG, mediaFile.toString());
+                        Bitmap image = getDrawingCache();
+
+                        if (mediaFile == null) {
+                            Log.e(TAG, "Error creating media file, check storage permissions: ");
+                            return;
+                        }
+                        try {
+                            FileOutputStream fos = new FileOutputStream(mediaFile);
+                            image.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                            fos.close();
+                        } catch (FileNotFoundException e) {
+                            Log.d(TAG, "File not found: " + e.getMessage());
+                        } catch (IOException e) {
+                            Log.d(TAG, "Error accessing file: " + e.getMessage());
+                        } catch (Exception e) {
+                            Log.d(TAG, "Exception: " + e.getMessage());
+                        }
+
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
+        // show it
+        alertDialog.show();
+
         return mediaFile;
     }
 
